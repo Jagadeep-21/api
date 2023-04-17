@@ -1,5 +1,5 @@
-const asyncHandler = require("async-handler");
-const Blog = require("../config/connectdb");
+
+const Blog = require("../models/reviewModel");
 
 const getReview =  async(req, res) => {
   const data= await Blog.find()

@@ -10,5 +10,5 @@ const reviewSchema= mongoose.Schema({
 },{
     timestamps:true
 });
-const Blog=mongoose.model('bqq',reviewSchema)
-module.exports=Blog
+const review=mongoose.model('bqq',reviewSchema)
+module.exports=review
