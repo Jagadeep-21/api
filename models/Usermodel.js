@@ -21,7 +21,14 @@ const userSchema =mongoose.Schema({
     },
     Blogs:[
         {type:String}
-    ]
+    ],
+    followers:[
+        {type:mongoose.Schema.ObjectId,ref:"Users"}
+
+    ],
+    following:[
+        {type:mongoose.Schema.ObjectId,ref:"Users"}
+    ],
 },{
     timestamps:true
 })

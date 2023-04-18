@@ -4,35 +4,48 @@ const Users = require("../models/Usermodel");
 const Comment = require("../models/commentModel");
 
 const newBlogPost = async (req, res) => {
-  const data = req.body;
-  const authorId = req.params.id;
-  const doc = await Users.findById(authorId);
-  if (!doc) {
-    throw new Error("only registered user would post");
-  } else {
-    //to prevent posting the same post by the same user
-    const blogexist = await Blog.find({
-      $and: [{ author: authorId }, { title: data.title }],
-    });
-    console.log(blogexist);
-    if (blogexist.length === 0) {
-      await Blog.create({
-        title: data.title,
-        content: data.content,
-        author: authorId,
-      })
-        .then((p) => {
-          res.send("your post has been added");
-          console.log(p._id);
-        })
-        .catch((e) => res.send(e.message));
-      await Users.findOneAndUpdate(
-        { _id: authorId },
-        { $push: { Blogs: data.title } }
-      );
+  try {
+    const data = req.body;
+    const tagArray = [ "final"];
+    console.log(tagArray);
+    const authorId = req.params.id;
+    //only authorized person can post a blog
+    const doc = await Users.findById(authorId);
+    if (!doc) {
+      throw new Error("only registered user would post");
     } else {
-      res.send("you have posted already the same post ");
+      //to prevent posting the same post by the same user
+      const blogexist = await Blog.find({
+        $and: [{ author: authorId }, { title: data.title }],
+      });
+      // console.log(blogexist);
+
+      if (blogexist.length === 0) {
+        await Blog.create({
+          title: data.title,
+          content: data.content,
+          author: authorId,
+        })
+          .then(async (p) => {
+            await Blog.findByIdAndUpdate(
+              p._id,
+              { $push: { tags: { $each: tagArray } } },
+              { new: true }
+            );
+            res.send("your post has been added");
+            console.log(p.tags);
+          })
+          .catch((e) => res.send(e.message));
+        await Users.findOneAndUpdate(
+          { _id: authorId },
+          { $push: { Blogs: data.title } }
+        );
+      } else {
+        res.send("you have posted already the same post ");
+      }
     }
+  } catch (e) {
+    console.log(e.message);
   }
 };
 const likeBlog = async (req, res) => {
@@ -124,17 +137,25 @@ const replyComment = async (req, res) => {
           $push: { replyArray: p._id },
         }).then(() => res.send("comment pushed"));
       });
-    };
+    }
   } catch (e) {
     res.send(e.message);
   }
   //find the user and upload the replyArray
+};
+const searchByTag = async (req, res) => {
+  // const queryArray = ;
+  // await Blog.find({ tags:["final", "csk"] })
+  await Blog.find( { tags: {$in:["final", "csk"]} } )
+    .then((p) => console.log(p))
+    .catch((e) => console.log(e.message));
 };
 module.exports = {
   newBlogPost,
   likeBlog,
   pushComment,
   replyComment,
+  searchByTag,
 };
 //afteruse of
 
