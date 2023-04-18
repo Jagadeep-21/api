@@ -7,11 +7,15 @@ const BlogSchema=mongoose.Schema({
     content:{
         type:String,required:true
     },
-    likes:{
-        type:mongoose.Schema.Types.ObjectId,ref:'Users'
-    },
-    author:
+    likes:[
        { type:mongoose.Schema.Types.ObjectId,ref:'Users'}
+    ],
+    author:
+       { type:mongoose.Schema.Types.ObjectId,ref:'Users'},
+    noOfLikes:{
+        type:Number,
+        default:0
+    }
     
 },
 {Timestamps:true})
